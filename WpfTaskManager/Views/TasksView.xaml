@@ -1,0 +1,105 @@
+﻿<UserControl x:Class="TasksManager.Views.TasksView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TasksManager.Views"
+             xmlns:viewModel="clr-namespace:TasksManager.ViewModels"
+             xmlns:helper="clr-namespace:TasksManager.Helper"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+
+    <UserControl.DataContext>
+        <viewModel:TaskViewModel />
+    </UserControl.DataContext>
+
+    <UserControl.Resources>
+        <helper:TaskStatusValueConverter x:Key="taskStatusColorConverter" />
+        <helper:DateValueConverter x:Key="dateValueConverter" />
+        <DataTemplate x:Key = "tasksTemplate">
+
+            <Grid Background="{Binding TaskStatus, Converter={StaticResource taskStatusColorConverter}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="44"  />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="2" />
+                </Grid.RowDefinitions>
+                <CheckBox IsChecked = "{Binding Path = IsComplete, Mode = TwoWay}" 
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          Margin="4"
+                          Grid.Column="0" Grid.Row="0"/>
+                <StackPanel Orientation = "Vertical"  Grid.Column="1" Grid.Row="0" Margin="5">
+
+                    <TextBlock Text = "{Binding DueDate, Converter={StaticResource dateValueConverter}, Mode = OneWay}"
+                           FontStyle="Normal"/>
+
+                    <TextBlock Text = "{Binding Path = TaskName, Mode = TwoWay}" 
+                           FontSize="18" FontWeight="Light"
+                           Width="400"/>
+
+                    <TextBlock Text = "{Binding Path = TaskStatus, Mode = OneWay}"
+                           FontStyle="Italic"
+                        VerticalAlignment="Center"/>
+
+
+                </StackPanel>
+
+                <Label Background="LightGray" Grid.ColumnSpan="2" Grid.Row="1" Height="1" Grid.Column="0" />
+            </Grid>
+
+
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="50" />
+        </Grid.RowDefinitions>
+        <ListBox 
+         Margin="10"
+         ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+         ItemsSource = "{Binding Tasks}" 
+         SelectedItem="{Binding SelectedTask}"
+         ItemTemplate = "{StaticResource tasksTemplate}"/>
+
+        <StackPanel Orientation="Vertical" Grid.Row="1" Margin="16" >
+            <TextBlock Text="New Task" Margin="4 0 0 0" />
+            <TextBox Text="{Binding NewTask.TaskName, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="4">
+                <TextBox.Resources>
+                    <Style TargetType="TextBox">
+                        <Style.Triggers>
+                            <Trigger Property="Validation.HasError" Value="True">
+                                <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)/ErrorContent}" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Resources>
+            </TextBox>
+
+            <TextBlock Text="Due Date" Margin="4 4 0 0" />
+            <DatePicker x:Name="dtDueDate" SelectedDateFormat="Long" SelectedDate="{Binding Path=NewTask.DueDate}" Margin="4">
+                <DatePicker.Resources>
+                    <Style TargetType="DatePickerTextBox">
+                        <Setter Property="IsReadOnly" Value="True"/>
+                    </Style>
+                </DatePicker.Resources>
+            </DatePicker>
+
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0, 0, 18, 14">
+            <Button Margin="0 0 10 0" Width="100" Command="{Binding Path = TaskButtonAddClick}">Add</Button>
+            <Button Margin="0 0 10 0" Width="100" Command="{Binding Path = TaskButtonEditClick}">Edit</Button>
+            <Button Width="100" Command="{Binding Path = TaskButtonRemoveClick}">Remove</Button>
+        </StackPanel>
+
+
+    </Grid>
+</UserControl>
