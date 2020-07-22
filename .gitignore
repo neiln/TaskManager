@@ -1,0 +1,10 @@
+**/.vs
+**/.vs/
+**/*.suo
+**/*.pdb
+**/*.vspscc
+**/_ReSharper**
+**/bin/**
+**/obj/**
+**/.
+packages
